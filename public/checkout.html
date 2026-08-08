@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout · WePlay Recharge</title>
+<style>
+  :root{
+    --ink:#1B2430;
+    --ink-soft:#6B7684;
+    --bg:#F4F6F7;
+    --card:#FFFFFF;
+    --line:#ECEEF0;
+    --brand-cyan:#12C7D6;
+    --price:#FF7A1A;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:"Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-height:100vh;
+    padding:20px;
+  }
+  .card{
+    background:var(--card);
+    border-radius:18px;
+    padding:28px;
+    width:100%;
+    max-width:400px;
+    box-shadow:0 16px 40px -18px rgba(20,30,40,.3);
+  }
+  h1{font-size:19px;margin:0 0 4px;}
+  .pkg{color:var(--ink-soft);font-size:13.5px;margin-bottom:20px;}
+  .amount{font-size:28px;font-weight:800;color:var(--price);margin-bottom:20px;}
+  label{font-size:12.5px;color:var(--ink-soft);display:block;margin:12px 0 4px;}
+  input{
+    width:100%;
+    padding:11px 12px;
+    border-radius:10px;
+    border:1px solid var(--line);
+    font-size:14px;
+  }
+  button{
+    width:100%;
+    margin-top:22px;
+    padding:14px;
+    border:none;
+    border-radius:999px;
+    background:var(--ink);
+    color:#fff;
+    font-weight:700;
+    font-size:15px;
+    cursor:pointer;
+  }
+  button:disabled{opacity:.5;cursor:not-allowed;}
+  .note{font-size:11.5px;color:var(--ink-soft);margin-top:14px;text-align:center;}
+</style>
+<!-- Cashfree's official checkout SDK -->
+<script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+</head>
+<body>
+
+  <div class="card">
+    <h1>Confirm Recharge</h1>
+    <div class="pkg" id="pkgLabel">3000 Gold</div>
+    <div class="amount" id="amountLabel">₹449</div>
+
+    <label>Full name</label>
+    <input type="text" id="customerName" placeholder="Manish Bhargav">
+
+    <label>Phone number</label>
+    <input type="tel" id="customerPhone" placeholder="9999999999">
+
+    <label>Email (optional)</label>
+    <input type="email" id="customerEmail" placeholder="you@example.com">
+
+    <button id="payBtn">Pay Now</button>
+    <div class="note">Test mode uses Cashfree sandbox — no real money moves until you switch CASHFREE_ENV to production.</div>
+  </div>
+
+<script>
+  // In your real recharge page, set these two values from whichever
+  // gold package the user tapped, e.g. via a query string or by
+  // storing the selection before redirecting here.
+  const params = new URLSearchParams(window.location.search);
+  const packageName = params.get('package') || '3000 Gold';
+  const amount = Number(params.get('amount')) || 449;
+
+  document.getElementById('pkgLabel').textContent = packageName;
+  document.getElementById('amountLabel').textContent = `₹${amount}`;
+
+  // "sandbox" while testing, switch to "production" once you go live
+  // and have swapped in your real Cashfree keys on the backend.
+  const cashfree = Cashfree({ mode: 'sandbox' });
+
+  document.getElementById('payBtn').addEventListener('click', async () => {
+    const customerName = document.getElementById('customerName').value.trim();
+    const customerPhone = document.getElementById('customerPhone').value.trim();
+    const customerEmail = document.getElementById('customerEmail').value.trim();
+
+    if (!customerPhone) {
+      alert('Phone number is required.');
+      return;
+    }
+
+    const btn = document.getElementById('payBtn');
+    btn.disabled = true;
+    btn.textContent = 'Processing…';
+
+    try {
+      const res = await fetch('/api/payment/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount, packageName, customerName, customerPhone, customerEmail }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.error || 'Could not start payment.');
+        btn.disabled = false;
+        btn.textContent = 'Pay Now';
+        return;
+      }
+
+      // Opens Cashfree's hosted checkout UI in the same tab.
+      cashfree.checkout({
+        paymentSessionId: data.paymentSessionId,
+        redirectTarget: '_self',
+      });
+    } catch (err) {
+      console.error(err);
+      alert('Something went wrong starting the payment.');
+      btn.disabled = false;
+      btn.textContent = 'Pay Now';
+    }
+  });
+</script>
+
+</body>
+</html>

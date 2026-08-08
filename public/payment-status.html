@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Payment Status</title>
+<style>
+  body{
+    margin:0;
+    font-family:"Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background:#F4F6F7;
+    color:#1B2430;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-height:100vh;
+    padding:20px;
+  }
+  .card{
+    background:#fff;
+    border-radius:18px;
+    padding:36px 28px;
+    max-width:380px;
+    width:100%;
+    text-align:center;
+    box-shadow:0 16px 40px -18px rgba(20,30,40,.3);
+  }
+  .icon{font-size:44px;margin-bottom:10px;}
+  h1{font-size:19px;margin:0 0 8px;}
+  p{color:#6B7684;font-size:14px;margin:0 0 22px;}
+  a{
+    display:inline-block;
+    padding:12px 28px;
+    border-radius:999px;
+    background:#1B2430;
+    color:#fff;
+    text-decoration:none;
+    font-weight:700;
+    font-size:14px;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon" id="icon">⏳</div>
+    <h1 id="title">Checking payment…</h1>
+    <p id="desc">Hang tight while we confirm your order.</p>
+    <a href="/">Back to home</a>
+  </div>
+
+<script>
+  // Cashfree redirects here as: /payment-status.html?order_id=order_xxx
+  // NOTE: this page only reflects Cashfree's redirect status for a
+  // nicer UX. The webhook (api/payment/webhook.js) is the source of
+  // truth for whether an order actually succeeded — always rely on
+  // that (or the admin dashboard) before granting gold, not this page.
+  const params = new URLSearchParams(window.location.search);
+  const orderId = params.get('order_id');
+
+  const icon = document.getElementById('icon');
+  const title = document.getElementById('title');
+  const desc = document.getElementById('desc');
+
+  if (!orderId) {
+    icon.textContent = '⚠️';
+    title.textContent = 'No order found';
+    desc.textContent = 'We could not find an order to check.';
+  } else {
+    // Optional: poll your own backend for the confirmed webhook status
+    // instead of just showing a generic "thank you" message.
+    icon.textContent = '✅';
+    title.textContent = 'Thanks!';
+    desc.textContent = `We're confirming order ${orderId}. Gold will appear in your account once payment is verified.`;
+  }
+</script>
+</body>
+</html>

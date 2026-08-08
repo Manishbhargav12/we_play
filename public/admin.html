@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WePlay Recharge · Admin</title>
+<style>
+  :root{
+    --ink:#1B2430;
+    --ink-soft:#6B7684;
+    --bg:#F4F6F7;
+    --card:#FFFFFF;
+    --line:#ECEEF0;
+    --brand-cyan:#12C7D6;
+    --price:#FF7A1A;
+    --ok:#1BA55D;
+    --fail:#E24C4C;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:"Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+  }
+
+  /* ---- password gate ---- */
+  #gate{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+  }
+  #gate .box{
+    background:var(--card);
+    padding:32px;
+    border-radius:18px;
+    width:100%;
+    max-width:360px;
+    box-shadow:0 16px 40px -18px rgba(20,30,40,.3);
+  }
+  #gate h1{font-size:19px;margin:0 0 18px;text-align:center;}
+  #gate input{
+    width:100%;
+    padding:12px 14px;
+    border-radius:10px;
+    border:1px solid var(--line);
+    font-size:14px;
+    margin-bottom:14px;
+  }
+  #gate button{
+    width:100%;
+    padding:12px;
+    border:none;
+    border-radius:10px;
+    background:var(--ink);
+    color:#fff;
+    font-weight:700;
+    cursor:pointer;
+  }
+  #gate .err{color:var(--fail);font-size:13px;margin-bottom:10px;display:none;}
+
+  /* ---- dashboard ---- */
+  #dashboard{display:none;padding:24px;max-width:1000px;margin:0 auto;}
+  header{
+    display:flex;justify-content:space-between;align-items:center;
+    margin-bottom:22px;
+  }
+  header h1{font-size:22px;margin:0;}
+  header button{
+    border:none;background:var(--card);border:1px solid var(--line);
+    padding:8px 14px;border-radius:8px;cursor:pointer;font-size:13px;
+  }
+
+  .stat-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(160px,1fr));
+    gap:14px;
+    margin-bottom:24px;
+  }
+  .stat-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:18px;
+  }
+  .stat-card .label{font-size:12.5px;color:var(--ink-soft);margin-bottom:6px;}
+  .stat-card .value{font-size:26px;font-weight:800;}
+
+  section{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:20px;
+    margin-bottom:22px;
+  }
+  section h2{font-size:15px;margin:0 0 16px;}
+
+  .bars{display:flex;align-items:flex-end;gap:6px;height:120px;}
+  .bar{
+    flex:1;
+    background:var(--brand-cyan);
+    border-radius:4px 4px 0 0;
+    position:relative;
+    min-height:2px;
+  }
+  .bar .tip{
+    position:absolute;
+    top:-18px;left:50%;transform:translateX(-50%);
+    font-size:10px;color:var(--ink-soft);
+    white-space:nowrap;
+  }
+  .bar-labels{
+    display:flex;gap:6px;margin-top:6px;
+  }
+  .bar-labels span{flex:1;text-align:center;font-size:9px;color:var(--ink-soft);}
+
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  th,td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--line);}
+  th{color:var(--ink-soft);font-weight:600;font-size:12px;}
+  .status{
+    padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700;
+  }
+  .status.SUCCESS{background:#E4F8ED;color:var(--ok);}
+  .status.PENDING{background:#FFF3E0;color:var(--price);}
+  .status.FAILED, .status.UNKNOWN{background:#FBE7E7;color:var(--fail);}
+
+  .empty{color:var(--ink-soft);font-size:13px;padding:14px 0;}
+</style>
+</head>
+<body>
+
+  <div id="gate">
+    <div class="box">
+      <h1>Admin Login</h1>
+      <div class="err" id="gateErr">Incorrect password.</div>
+      <input type="password" id="pwInput" placeholder="Admin password">
+      <button id="pwBtn">Enter</button>
+    </div>
+  </div>
+
+  <div id="dashboard">
+    <header>
+      <h1>Recharge Dashboard</h1>
+      <button id="refreshBtn">Refresh</button>
+    </header>
+
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="label">Total visits</div>
+        <div class="value" id="totalVisits">–</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Visits today</div>
+        <div class="value" id="todayVisits">–</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Total orders</div>
+        <div class="value" id="totalOrders">–</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Successful payments</div>
+        <div class="value" id="successOrders">–</div>
+      </div>
+    </div>
+
+    <section>
+      <h2>Visits — last 14 days</h2>
+      <div class="bars" id="bars"></div>
+      <div class="bar-labels" id="barLabels"></div>
+    </section>
+
+    <section>
+      <h2>Recent orders</h2>
+      <div id="ordersTableWrap"><div class="empty">Loading…</div></div>
+    </section>
+
+    <section>
+      <h2>Recent visits</h2>
+      <div id="visitsTableWrap"><div class="empty">Loading…</div></div>
+    </section>
+  </div>
+
+<script>
+  const gate = document.getElementById('gate');
+  const dashboard = document.getElementById('dashboard');
+  const pwInput = document.getElementById('pwInput');
+  const pwBtn = document.getElementById('pwBtn');
+  const gateErr = document.getElementById('gateErr');
+
+  let adminPassword = sessionStorage.getItem('admin_pw') || '';
+
+  async function tryLoad(pw) {
+    const res = await fetch('/api/admin/visits', {
+      headers: { 'x-admin-password': pw },
+    });
+    if (res.status === 401) return false;
+    const data = await res.json();
+    renderVisits(data);
+    loadOrders(pw);
+    return true;
+  }
+
+  async function loadOrders(pw) {
+    const res = await fetch('/api/admin/orders', {
+      headers: { 'x-admin-password': pw },
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    renderOrders(data.orders || []);
+  }
+
+  function renderVisits(data) {
+    document.getElementById('totalVisits').textContent = data.total ?? 0;
+    const today = data.daily[data.daily.length - 1];
+    document.getElementById('todayVisits').textContent = today ? today.count : 0;
+
+    const max = Math.max(1, ...data.daily.map(d => d.count));
+    const bars = document.getElementById('bars');
+    const labels = document.getElementById('barLabels');
+    bars.innerHTML = '';
+    labels.innerHTML = '';
+    data.daily.forEach(d => {
+      const bar = document.createElement('div');
+      bar.className = 'bar';
+      bar.style.height = `${(d.count / max) * 100}%`;
+      bar.innerHTML = `<span class="tip">${d.count}</span>`;
+      bars.appendChild(bar);
+
+      const label = document.createElement('span');
+      label.textContent = d.day.slice(5); // MM-DD
+      labels.appendChild(label);
+    });
+
+    const wrap = document.getElementById('visitsTableWrap');
+    if (!data.recent || data.recent.length === 0) {
+      wrap.innerHTML = '<div class="empty">No visits recorded yet.</div>';
+      return;
+    }
+    let rows = data.recent.slice(0, 20).map(v => `
+      <tr>
+        <td>${new Date(v.ts).toLocaleString()}</td>
+        <td>${v.page}</td>
+        <td>${v.ip}</td>
+        <td>${(v.referrer || '—')}</td>
+      </tr>
+    `).join('');
+    wrap.innerHTML = `
+      <table>
+        <thead><tr><th>Time</th><th>Page</th><th>IP</th><th>Referrer</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    `;
+  }
+
+  function renderOrders(orders) {
+    document.getElementById('totalOrders').textContent = orders.length;
+    document.getElementById('successOrders').textContent =
+      orders.filter(o => o.status === 'SUCCESS').length;
+
+    const wrap = document.getElementById('ordersTableWrap');
+    if (orders.length === 0) {
+      wrap.innerHTML = '<div class="empty">No orders yet.</div>';
+      return;
+    }
+    let rows = orders.slice(0, 20).map(o => `
+      <tr>
+        <td>${new Date(o.createdAt).toLocaleString()}</td>
+        <td>${o.packageName || '—'}</td>
+        <td>₹${o.amount}</td>
+        <td>${o.customerName || '—'} <br><span style="color:#8A93A0">${o.customerPhone || ''}</span></td>
+        <td><span class="status ${o.status}">${o.status}</span></td>
+      </tr>
+    `).join('');
+    wrap.innerHTML = `
+      <table>
+        <thead><tr><th>Time</th><th>Package</th><th>Amount</th><th>Customer</th><th>Status</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    `;
+  }
+
+  async function unlock(pw) {
+    const ok = await tryLoad(pw);
+    if (ok) {
+      sessionStorage.setItem('admin_pw', pw);
+      adminPassword = pw;
+      gate.style.display = 'none';
+      dashboard.style.display = 'block';
+    } else {
+      gateErr.style.display = 'block';
+    }
+  }
+
+  pwBtn.addEventListener('click', () => unlock(pwInput.value));
+  pwInput.addEventListener('keydown', e => { if (e.key === 'Enter') unlock(pwInput.value); });
+  document.getElementById('refreshBtn').addEventListener('click', () => unlock(adminPassword));
+
+  // Auto-unlock if we already have a password from this session.
+  if (adminPassword) unlock(adminPassword);
+</script>
+
+</body>
+</html>

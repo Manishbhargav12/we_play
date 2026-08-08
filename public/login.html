@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WePlay · Login</title>
+<style>
+  :root{
+    --ink:#1B2430;
+    --ink-soft:#8A93A0;
+    --bg:#EFF1F3;
+    --card:#FFFFFF;
+    --line:#ECEEF0;
+    --brand-cyan:#12C7D6;
+    --accent-orange:#FF7A1A;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:"Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+  }
+
+  /* ---------------- login card ---------------- */
+  .login-card{
+    width:100%;
+    max-width:420px;
+    background:var(--card);
+    border-radius:22px;
+    padding:36px 28px 32px;
+    box-shadow:0 20px 50px -20px rgba(20,30,40,.25);
+  }
+  .login-card h1{
+    text-align:center;
+    font-size:22px;
+    font-weight:800;
+    margin:0 0 24px;
+  }
+  .segmented{
+    display:flex;
+    background:#F2F3F5;
+    border-radius:12px;
+    padding:4px;
+    margin-bottom:34px;
+  }
+  .segmented button{
+    flex:1;
+    border:none;
+    background:transparent;
+    padding:11px 8px;
+    font-size:14px;
+    font-weight:600;
+    color:var(--ink-soft);
+    border-radius:9px;
+    cursor:pointer;
+    transition:background .2s ease, color .2s ease, box-shadow .2s ease;
+  }
+  .segmented button.active{
+    background:#fff;
+    color:var(--ink);
+    font-weight:700;
+    box-shadow:0 3px 8px -3px rgba(20,30,40,.25);
+  }
+
+  .id-input-wrap{
+    margin-bottom:20px;
+  }
+  .id-input{
+    width:100%;
+    border:none;
+    border-bottom:1px solid var(--line);
+    padding:10px 2px 12px;
+    font-size:15px;
+    color:var(--ink);
+    outline:none;
+    background:transparent;
+  }
+  .id-input::placeholder{color:#BFC5CC;}
+  .id-input:focus{border-bottom-color:var(--brand-cyan);}
+
+  .help-link{
+    display:block;
+    text-align:center;
+    margin:8px 0 40px;
+    font-size:13.5px;
+    color:var(--brand-cyan);
+    text-decoration:none;
+    cursor:pointer;
+    background:none;
+    border:none;
+    width:100%;
+  }
+  .help-link:hover{text-decoration:underline;}
+
+  .next-btn{
+    width:100%;
+    border:none;
+    border-radius:999px;
+    background:#14181F;
+    color:#fff;
+    font-size:16px;
+    font-weight:700;
+    padding:15px 0;
+    cursor:pointer;
+    transition:opacity .2s ease, transform .1s ease;
+  }
+  .next-btn:disabled{opacity:.35;cursor:not-allowed;}
+  .next-btn:not(:disabled):active{transform:scale(.98);}
+
+  /* scan-code panel (shown when that tab is active) */
+  .scan-panel{
+    display:none;
+    flex-direction:column;
+    align-items:center;
+    padding:20px 0 40px;
+  }
+  .scan-panel .qr-box{
+    width:170px;height:170px;
+    border-radius:16px;
+    background:
+      repeating-linear-gradient(0deg, #1B2430 0 4px, transparent 4px 8px),
+      repeating-linear-gradient(90deg, #1B2430 0 4px, transparent 4px 8px);
+    background-size:100% 8px, 8px 100%;
+    background-blend-mode:multiply;
+    background-color:#fff;
+    border:1px solid var(--line);
+    position:relative;
+  }
+  .scan-panel .qr-box::before{
+    content:"";
+    position:absolute;
+    inset:14px;
+    background:#fff;
+  }
+  .scan-panel p{
+    margin-top:18px;
+    font-size:13.5px;
+    color:var(--ink-soft);
+    text-align:center;
+  }
+
+  /* ---------------- help modal ---------------- */
+  .modal-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(20,24,30,.55);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    z-index:100;
+  }
+  .modal-overlay.open{display:flex;}
+  .modal{
+    background:#fff;
+    border-radius:20px;
+    max-width:640px;
+    width:100%;
+    padding:32px 32px 28px;
+    position:relative;
+    max-height:90vh;
+    overflow-y:auto;
+  }
+  .modal-close{
+    position:absolute;
+    top:16px;right:16px;
+    width:32px;height:32px;
+    border-radius:50%;
+    border:none;
+    background:#F2F3F5;
+    color:var(--ink);
+    font-size:16px;
+    cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .modal h2{
+    text-align:center;
+    font-size:19px;
+    font-weight:800;
+    margin:0 0 22px;
+  }
+  .modal-steps{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:22px;
+  }
+  .modal-step p.step-desc{
+    font-size:13.5px;
+    line-height:1.5;
+    color:var(--ink);
+    margin:0 0 12px;
+  }
+
+  .step-image{
+    width:100%;
+    border-radius:14px;
+    border:1px solid var(--line);
+    display:block;
+  }
+
+  @media (max-width:520px){
+    .modal-steps{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+  <div class="login-card">
+    <h1>Enter your WePlay ID</h1>
+
+    <div class="segmented">
+      <button id="tabScan">Scan code to login</button>
+      <button id="tabId" class="active">Enter your WePlay ID</button>
+    </div>
+
+    <div id="idPanel">
+      <div class="id-input-wrap">
+        <input type="text" class="id-input" id="idInput" placeholder="Enter your WePlay ID">
+      </div>
+      <button class="help-link" id="howToBtn">How to get user ID?</button>
+      <button class="next-btn" id="nextBtn" disabled>Next</button>
+    </div>
+
+    <div class="scan-panel" id="scanPanel">
+      <div class="qr-box"></div>
+      <p>Open the WePlay app and scan this code<br>to log in on this device.</p>
+    </div>
+  </div>
+
+  <!-- ---------------- help modal ---------------- -->
+  <div class="modal-overlay" id="helpOverlay">
+    <div class="modal">
+      <button class="modal-close" id="modalClose">✕</button>
+      <h2>How to get user ID?</h2>
+      <div class="modal-steps">
+
+        <div class="modal-step">
+          <p class="step-desc">1. Start WePlay app, go to 'Me' page and click profile.</p>
+          <img class="step-image" src="/images/sign.png" alt="Step 1 — go to Me page and click profile">
+        </div>
+
+        <div class="modal-step">
+          <p class="step-desc">2. Click to copy user ID.</p>
+          <img class="step-image" src="/images/sign1.png" alt="Step 2 — click to copy user ID">
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+<script>
+  // ---- tab switching (Scan / Enter ID) ----
+  const tabScan = document.getElementById('tabScan');
+  const tabId   = document.getElementById('tabId');
+  const idPanel   = document.getElementById('idPanel');
+  const scanPanel = document.getElementById('scanPanel');
+
+  function showId(){
+    tabId.classList.add('active');
+    tabScan.classList.remove('active');
+    idPanel.style.display = 'block';
+    scanPanel.style.display = 'none';
+  }
+  function showScan(){
+    tabScan.classList.add('active');
+    tabId.classList.remove('active');
+    scanPanel.style.display = 'flex';
+    idPanel.style.display = 'none';
+  }
+  tabId.addEventListener('click', showId);
+  tabScan.addEventListener('click', showScan);
+
+  // ---- enable Next button once something is typed ----
+  const idInput = document.getElementById('idInput');
+  const nextBtn = document.getElementById('nextBtn');
+  idInput.addEventListener('input', () => {
+    nextBtn.disabled = idInput.value.trim().length === 0;
+  });
+  nextBtn.addEventListener('click', () => {
+    if (!nextBtn.disabled){
+      window.location.href = `recharge.html?uid=${encodeURIComponent(idInput.value.trim())}`;
+    }
+  });
+
+  // ---- help modal open/close ----
+  const helpOverlay = document.getElementById('helpOverlay');
+  document.getElementById('howToBtn').addEventListener('click', () => helpOverlay.classList.add('open'));
+  document.getElementById('modalClose').addEventListener('click', () => helpOverlay.classList.remove('open'));
+  helpOverlay.addEventListener('click', (e) => {
+    if (e.target === helpOverlay) helpOverlay.classList.remove('open');
+  });
+</script>
+
+  <script src="/track-snippet.js"></script>
+</body>
+</html>

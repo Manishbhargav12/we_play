@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WePlay · Login</title>
+<style>
+  :root{
+    --ink:#1B2430;
+    --ink-soft:#8A93A0;
+    --bg:#EFF1F3;
+    --card:#FFFFFF;
+    --line:#ECEEF0;
+    --brand-cyan:#12C7D6;
+    --accent-orange:#FF7A1A;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:"Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+  }
+
+  /* ---------------- login card ---------------- */
+  .login-card{
+    width:100%;
+    max-width:420px;
+    background:var(--card);
+    border-radius:22px;
+    padding:36px 28px 32px;
+    box-shadow:0 20px 50px -20px rgba(20,30,40,.25);
+  }
+  .login-card h1{
+    text-align:center;
+    font-size:22px;
+    font-weight:800;
+    margin:0 0 24px;
+  }
+
+  .id-input-wrap{
+    margin-bottom:20px;
+  }
+  .id-input{
+    width:100%;
+    border:none;
+    border-bottom:1px solid var(--line);
+    padding:10px 2px 12px;
+    font-size:15px;
+    color:var(--ink);
+    outline:none;
+    background:transparent;
+  }
+  .id-input::placeholder{color:#BFC5CC;}
+  .id-input:focus{border-bottom-color:var(--brand-cyan);}
+
+  #userIdError{
+    display:block;
+    font-size:13px;
+    color:red;
+    margin-top:6px;
+  }
+
+  .help-link{
+    display:block;
+    text-align:center;
+    margin:8px 0 24px;
+    font-size:13.5px;
+    color:var(--brand-cyan);
+    text-decoration:none;
+    cursor:pointer;
+    background:none;
+    border:none;
+    width:100%;
+  }
+  .help-link:hover{text-decoration:underline;}
+
+  /* ---------------- responsibility checkbox ---------------- */
+  .disclaimer-check{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    margin-bottom:10px;
+    cursor:pointer;
+  }
+  .disclaimer-check input[type="checkbox"]{
+    flex:0 0 auto;
+    width:18px;
+    height:18px;
+    margin-top:2px;
+    accent-color:var(--brand-cyan);
+    cursor:pointer;
+  }
+  .disclaimer-check span{
+    font-size:12.5px;
+    line-height:1.5;
+    color:var(--ink-soft);
+  }
+  #checkboxError{
+    display:none;
+    font-size:13px;
+    color:red;
+    margin:0 0 20px;
+  }
+
+  .next-btn{
+    width:100%;
+    border:none;
+    border-radius:999px;
+    background:#14181F;
+    color:#fff;
+    font-size:16px;
+    font-weight:700;
+    padding:15px 0;
+    cursor:pointer;
+    transition:opacity .2s ease, transform .1s ease;
+  }
+  .next-btn:disabled{opacity:.35;cursor:not-allowed;}
+  .next-btn:not(:disabled):active{transform:scale(.98);}
+
+  /* ---------------- help modal ---------------- */
+  .modal-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(20,24,30,.55);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    z-index:100;
+  }
+  .modal-overlay.open{display:flex;}
+  .modal{
+    background:#fff;
+    border-radius:20px;
+    max-width:640px;
+    width:100%;
+    padding:32px 32px 28px;
+    position:relative;
+    max-height:90vh;
+    overflow-y:auto;
+  }
+  .modal-close{
+    position:absolute;
+    top:16px;right:16px;
+    width:32px;height:32px;
+    border-radius:50%;
+    border:none;
+    background:#F2F3F5;
+    color:var(--ink);
+    font-size:16px;
+    cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .modal h2{
+    text-align:center;
+    font-size:19px;
+    font-weight:800;
+    margin:0 0 22px;
+  }
+  .modal-steps{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:22px;
+  }
+  .modal-step p.step-desc{
+    font-size:13.5px;
+    line-height:1.5;
+    color:var(--ink);
+    margin:0 0 12px;
+  }
+
+  .step-image{
+    width:100%;
+    border-radius:14px;
+    border:1px solid var(--line);
+    display:block;
+  }
+  a{
+    text-decoration:none;
+    color:inherit;}
+
+  @media (max-width:520px){
+    .modal-steps{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+<script src="/track-snippet.js"></script>
+<script src="analytics.js"></script>
+
+  <div class="login-card">
+    <h1>Enter your WePlay ID</h1>
+
+    <div id="idPanel">
+      <div class="id-input-wrap">
+        <input type="text" class="id-input" id="idInput" placeholder="Double Check Your ID Before Next" required>
+      </div>
+      <button class="help-link" id="howToBtn">How to get user ID?</button>
+      <span id="userIdError" style="display:none;">Invalid WePlay User ID</span>
+
+      <label class="disclaimer-check" for="responsibilityCheck">
+        <input type="checkbox" id="responsibilityCheck" required>
+        <span>I confirm my WePlay ID is correct. I understand that I am fully responsible if I enter an incorrect ID, and WePlay bears no responsibility for recharges sent to a wrong ID.</span>
+      </label>
+      <span id="checkboxError">Please confirm you accept responsibility for entering the correct ID.</span>
+
+      <button class="next-btn" id="nextBtn" disabled>Next</button>
+    </div>
+  </div>
+
+  <!-- ---------------- help modal ---------------- -->
+  <div class="modal-overlay" id="helpOverlay">
+    <div class="modal">
+      <button class="modal-close" id="modalClose">✕</button>
+      <h2>How to get user ID?</h2>
+      <div class="modal-steps">
+
+        <div class="modal-step">
+          <p class="step-desc">1. Start WePlay app, go to 'Me' page and click profile.</p>
+          <img class="step-image" src="sign.png" alt="Step 1 — go to Me page and click profile">
+        </div>
+
+        <div class="modal-step">
+          <p class="step-desc">2. Click to copy user ID.</p>
+          <img class="step-image" src="sign1.png" alt="Step 2 — click to copy user ID">
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+<script>
+  // ---- elements ----
+  const idInput = document.getElementById('idInput');
+  const nextBtn = document.getElementById('nextBtn');
+  const responsibilityCheck = document.getElementById('responsibilityCheck');
+  const checkboxError = document.getElementById('checkboxError');
+
+  // ---- enable Next button only when ID is filled AND checkbox is checked ----
+  function updateNextState(){
+    const hasId = idInput.value.trim().length > 0;
+    nextBtn.disabled = !(hasId && responsibilityCheck.checked);
+  }
+  idInput.addEventListener('input', updateNextState);
+  responsibilityCheck.addEventListener('change', () => {
+    checkboxError.style.display = 'none';
+    updateNextState();
+  });
+
+  nextBtn.addEventListener('click', () => {
+    // guard: don't proceed without the checkbox, even if the disabled state is somehow bypassed
+    if (!responsibilityCheck.checked){
+      checkboxError.style.display = 'block';
+      return;
+    }
+    if (idInput.value.trim().length === 0){
+      return;
+    }
+    const value = idInput.value.trim();
+    localStorage.setItem("myValue", value);
+    if (window.WPAnalytics) window.WPAnalytics.logEvent('id_confirmed');
+    window.location.href = 'weplay-recharge.html';
+  });
+
+  // ---- help modal open/close ----
+  const helpOverlay = document.getElementById('helpOverlay');
+  document.getElementById('howToBtn').addEventListener('click', () => {
+    helpOverlay.classList.add('open');
+    if (window.WPAnalytics) window.WPAnalytics.logEvent('help_opened');
+  });
+  document.getElementById('modalClose').addEventListener('click', () => helpOverlay.classList.remove('open'));
+  helpOverlay.addEventListener('click', (e) => {
+    if (e.target === helpOverlay) helpOverlay.classList.remove('open');
+  });
+</script>
+
+</body>
+</html>
