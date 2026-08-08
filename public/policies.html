@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WePlay Recharge · Policies</title>
+<style>
+  :root{
+    --ink:#1B2430; --ink-soft:#6B7684; --bg:#F4F6F7;
+    --card:#FFFFFF; --line:#ECEEF0; --brand-cyan:#12C7D6;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);}
+  .wrap{max-width:640px;margin:0 auto;padding:24px 18px 60px;}
+  h1{font-size:22px;margin:0 0 18px;}
+  .tabs{display:flex;gap:8px;margin-bottom:20px;background:#F2F3F5;border-radius:12px;padding:4px;}
+  .tab{flex:1;border:none;background:transparent;padding:10px 6px;font-size:13px;font-weight:700;color:var(--ink-soft);border-radius:9px;cursor:pointer;}
+  .tab.active{background:#fff;color:var(--ink);box-shadow:0 3px 8px -3px rgba(20,30,40,.25);}
+  .panel{display:none;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;}
+  .panel.active{display:block;}
+  .panel h2{font-size:17px;margin:0 0 12px;}
+  .panel h3{font-size:14px;margin:18px 0 6px;}
+  .panel p, .panel li{font-size:14px;line-height:1.6;color:var(--ink-soft);}
+  .panel ul{padding-left:18px;margin:0 0 10px;}
+  .contact-row{display:flex;gap:10px;align-items:center;margin-bottom:12px;font-size:14px;}
+  .contact-row b{width:70px;color:var(--ink);flex:none;}
+  a{color:var(--brand-cyan);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>WePlay Recharge — Policies</h1>
+
+  <div class="tabs">
+    <button class="tab active" data-t="contact">Contact Us</button>
+    <button class="tab" data-t="terms">Terms &amp; Conditions</button>
+    <button class="tab" data-t="refunds">Refunds &amp; Cancellations</button>
+  </div>
+
+  <div class="panel active" id="contact">
+    <h2>Contact Us</h2>
+    <p>Have a question about an order, recharge, or your account? Reach out through any of the channels below.</p>
+    <div class="contact-row"><b>Email</b> <a href="mailto:support@yourdomain.com">support@yourdomain.com</a></div>
+    <div class="contact-row"><b>Phone</b> +91-XXXXXXXXXX</div>
+    <div class="contact-row"><b>Hours</b> Mon–Sat, 10:00 AM – 7:00 PM IST</div>
+    <div class="contact-row"><b>Address</b> Your Business Name, Jaipur, Rajasthan, India</div>
+    <p>We usually respond within 24 hours on business days.</p>
+  </div>
+
+  <div class="panel" id="terms">
+    <h2>Terms &amp; Conditions</h2>
+    <p>By using this website and purchasing gold/top-up packages, you agree to the following terms.</p>
+    <h3>1. Service</h3>
+    <p>We act as a reseller facilitating gold/currency top-ups for the WePlay app using the user ID you provide. We are not affiliated with, endorsed by, or an official partner of WePlay unless stated otherwise.</p>
+    <h3>2. Accuracy of Information</h3>
+    <p>You are responsible for entering the correct WePlay user ID. We are not liable for gold credited to a wrong account due to an incorrect ID entered at checkout.</p>
+    <h3>3. Pricing</h3>
+    <p>All prices are listed in INR and may change without prior notice. The price at the time of order confirmation is final.</p>
+    <h3>4. Payments</h3>
+    <p>Payments are processed securely through our payment gateway partner (Cashfree). We do not store your card or UPI credentials.</p>
+    <h3>5. Delivery</h3>
+    <p>Gold/top-up credit is typically delivered within a few minutes of successful payment confirmation, subject to WePlay's own processing times.</p>
+    <h3>6. Limitation of Liability</h3>
+    <p>We are not liable for indirect or consequential losses arising from delays, app downtime, or issues on WePlay's platform outside our control.</p>
+  </div>
+
+  <div class="panel" id="refunds">
+    <h2>Refunds &amp; Cancellations</h2>
+    <h3>Order Cancellations</h3>
+    <p>Orders cannot be cancelled once payment is completed and gold has been credited to the provided user ID, as this is a digital, non-returnable product.</p>
+    <h3>Eligible Refunds</h3>
+    <ul>
+      <li>Payment was deducted but the order failed to process (no gold credited).</li>
+      <li>You were charged more than once for the same order due to a technical error.</li>
+    </ul>
+    <h3>Non-Refundable Cases</h3>
+    <ul>
+      <li>Gold was successfully credited to the user ID you entered, including if the ID was entered incorrectly.</li>
+      <li>Change of mind after successful delivery.</li>
+    </ul>
+    <h3>How to Request a Refund</h3>
+    <p>Email <a href="mailto:support@yourdomain.com">support@yourdomain.com</a> with your order ID and payment reference within 7 days of the transaction. Approved refunds are processed back to the original payment method within 5–7 business days via Cashfree.</p>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('.tab').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(btn.dataset.t).classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>
