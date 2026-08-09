@@ -55,7 +55,7 @@
   }
   .brand-mark{
     width:44px;height:44px;border-radius:14px;
-    background-image:url("images/dp.jpeg");
+    background-image:url("dp.jpeg");
     background-size:cover;
     background-position:center;
     box-shadow:inset 0 -3px 0 rgba(0,0,0,.08);
@@ -261,16 +261,16 @@
   <div class="carousel" id="carousel">
     <div class="carousel-track" id="carouselTrack">
       <div class="carousel-slide">
-        <div class="slide-blur" style="background-image:url('images/coursel1.jpeg')"></div>
-        <img class="slide-img" src="images/coursel1.jpeg" alt="Recharge promotion 1">
+        <div class="slide-blur" style="background-image:url('coursel1.jpeg')"></div>
+        <img class="slide-img" src="coursel1.jpeg" alt="Recharge promotion 1">
       </div>
       <div class="carousel-slide">
-        <div class="slide-blur" style="background-image:url('images/coursel2.jpeg')"></div>
-        <img class="slide-img" src="images/coursel2.jpeg" alt="Recharge promotion 2">
+        <div class="slide-blur" style="background-image:url('coursel2.jpeg')"></div>
+        <img class="slide-img" src="coursel2.jpeg" alt="Recharge promotion 2">
       </div>
       <div class="carousel-slide">
-        <div class="slide-blur" style="background-image:url('images/coursel3.jpeg')"></div>
-        <img class="slide-img" src="images/coursel3.jpeg" alt="Recharge promotion 3">
+        <div class="slide-blur" style="background-image:url('coursel3.jpeg')"></div>
+        <img class="slide-img" src="coursel3.jpeg" alt="Recharge promotion 3">
       </div>
     </div>
     <div class="carousel-dots" id="carouselDots">
@@ -300,26 +300,7 @@
     { name: "4M Gold",   price: 35798, bonus: 400000, coinTier:'bunch', combo:2 , link: "https://payments.cashfree.com/forms/weplay-seven122k"},
     { name: "5M Gold",   price: 45995, bonus: 500000, coinTier:'bunch', combo:5 , link: "https://payments.cashfree.com/forms/weplay-seven40k"},
   ];
-
-
-  function attachBuyListeners() {
-  document.querySelectorAll("[goldPackages]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const idx = Number(btn.dataset.goldPackages);
-      const pkg = goldPackages[idx];
-      window.location.href = pkg.link;
-      // or: window.open(pkg.link, "_blank");
-    });
-  });
-}
-
-  goldPackages.forEach((pkg, i) => {
-  html += `<button data-package-index="${i}">Buy ${pkg.name}</button>`;
-});
-attachBuyListeners();
-
-  // one shared gold gradient per icon instance, reused by all coin sizes
-  function goldDefs(uid){
+function goldDefs(uid){
     return `<linearGradient id="coin${uid}" x1="0" y1="0" x2="1" y2="1">
         <stop offset="0%" stop-color="#FFF6D9"/>
         <stop offset="55%" stop-color="#FFD24C"/>
@@ -414,7 +395,7 @@ attachBuyListeners();
     `;
     card.addEventListener('click', () => {
       if (window.WPAnalytics) window.WPAnalytics.logEvent('package_click', { name: pkg.name, price: pkg.price });
-      alert(`Selected: ${pkg.name} for ₹${pkg.price.toLocaleString('en-IN')} (+${formatBonus(pkg.bonus)} bonus)`);
+      window.location.href = pkg.link;
     });
     list.appendChild(card);
   });
@@ -442,7 +423,6 @@ attachBuyListeners();
     function stop(){ clearInterval(timer); }
 
     start();
-    
 
     // swipe support
     let startX = 0;
