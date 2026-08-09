@@ -425,6 +425,16 @@
     function stop(){ clearInterval(timer); }
 
     start();
+    function attachBuyListeners() {
+  document.querySelectorAll("[data-package-index]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const idx = Number(btn.dataset.packageIndex);
+      const pkg = goldPackages[idx];
+      window.location.href = pkg.link;
+      // or: window.open(pkg.link, "_blank");
+    });
+  });
+}
 
     // swipe support
     let startX = 0;
