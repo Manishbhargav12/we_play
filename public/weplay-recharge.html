@@ -301,6 +301,18 @@
     { name: "5M Gold",   price: 45995, bonus: 500000, coinTier:'bunch', combo:5 , link: "https://payments.cashfree.com/forms/weplay-seven40k"},
   ];
 
+
+  function attachBuyListeners() {
+  document.querySelectorAll("[goldPackages]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const idx = Number(btn.dataset.goldPackages);
+      const pkg = goldPackages[idx];
+      window.location.href = pkg.link;
+      // or: window.open(pkg.link, "_blank");
+    });
+  });
+}
+
   // one shared gold gradient per icon instance, reused by all coin sizes
   function goldDefs(uid){
     return `<linearGradient id="coin${uid}" x1="0" y1="0" x2="1" y2="1">
@@ -425,16 +437,7 @@
     function stop(){ clearInterval(timer); }
 
     start();
-    function attachBuyListeners() {
-  document.querySelectorAll("[data-package-index]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const idx = Number(btn.dataset.packageIndex);
-      const pkg = goldPackages[idx];
-      window.location.href = pkg.link;
-      // or: window.open(pkg.link, "_blank");
-    });
-  });
-}
+    
 
     // swipe support
     let startX = 0;
