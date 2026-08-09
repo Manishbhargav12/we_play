@@ -313,6 +313,11 @@
   });
 }
 
+  goldPackages.forEach((pkg, i) => {
+  html += `<button data-package-index="${i}">Buy ${pkg.name}</button>`;
+});
+attachBuyListeners();
+
   // one shared gold gradient per icon instance, reused by all coin sizes
   function goldDefs(uid){
     return `<linearGradient id="coin${uid}" x1="0" y1="0" x2="1" y2="1">
