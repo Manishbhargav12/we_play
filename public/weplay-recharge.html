@@ -239,141 +239,11 @@
     padding:3px 10px;
     border-radius:0 0 8px 8px;
   }
-
-  /* ---- UPI payment modal ---- */
-  .pay-modal-overlay{
-    position:fixed;
-    inset:0;
-    background:rgba(27,36,48,.55);
-    display:none;
-    align-items:center;
-    justify-content:center;
-    z-index:50;
-    padding:20px;
-  }
-  .pay-modal-overlay.open{display:flex;}
-  .pay-modal{
-    background:var(--card);
-    border-radius:20px;
-    width:100%;
-    max-width:360px;
-    padding:22px;
-    position:relative;
-    box-shadow:0 20px 40px -12px rgba(0,0,0,.35);
-    max-height:92vh;
-    overflow-y:auto;
-  }
-  .pay-modal-close{
-    position:absolute;
-    top:14px;right:14px;
-    width:28px;height:28px;
-    border-radius:50%;
-    border:none;
-    background:#F2F3F5;
-    color:var(--ink-soft);
-    font-size:15px;
-    line-height:1;
-    cursor:pointer;
-    display:flex;align-items:center;justify-content:center;
-  }
-  .pay-modal h3{
-    margin:0 0 2px;
-    font-size:18px;
-    font-weight:800;
-    padding-right:30px;
-  }
-  .pay-modal .pay-amount{
-    font-size:26px;
-    font-weight:800;
-    color:var(--price);
-    margin:2px 0 16px;
-  }
-  .pay-modal .qr-wrap{
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    min-height:200px;
-    padding:14px;
-    background:#FAFBFB;
-    border:1px solid var(--line);
-    border-radius:14px;
-    margin-bottom:14px;
-  }
-  .pay-modal .qr-fallback{
-    font-size:12.5px;
-    color:var(--ink-soft);
-    text-align:center;
-  }
-  .pay-modal .upi-row{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:10px;
-    background:#F2F3F5;
-    border-radius:12px;
-    padding:10px 12px;
-    margin-bottom:14px;
-    font-size:13px;
-  }
-  .pay-modal .upi-row .upi-id{
-    font-weight:700;
-    color:var(--ink);
-    letter-spacing:.2px;
-    word-break:break-all;
-  }
-  .pay-modal .copy-btn{
-    flex:none;
-    border:none;
-    background:var(--brand-cyan);
-    color:#fff;
-    font-size:12px;
-    font-weight:700;
-    padding:7px 11px;
-    border-radius:8px;
-    cursor:pointer;
-  }
-  .pay-modal .pay-btn{
-    display:block;
-    width:100%;
-    text-align:center;
-    background:var(--brand-cyan);
-    color:#fff;
-    font-weight:800;
-    font-size:15px;
-    padding:13px;
-    border-radius:12px;
-    text-decoration:none;
-    margin-bottom:10px;
-    border:none;
-    cursor:pointer;
-  }
-  .pay-modal .alt-link{
-    display:block;
-    text-align:center;
-    font-size:13px;
-    color:var(--ink-soft);
-    text-decoration:underline;
-    margin-bottom:4px;
-  }
-  .pay-modal .note{
-    font-size:11.5px;
-    color:var(--ink-soft);
-    text-align:center;
-    line-height:1.5;
-    margin-top:12px;
-  }
-  .pay-modal .order-id{
-    font-size:11px;
-    color:var(--ink-soft);
-    text-align:center;
-    margin-top:2px;
-  }
 </style>
 </head>
 <body>
 <script src="analytics.js"></script>
 <script src="/track-snippet.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 
 <div class="app-shell">
 
@@ -416,29 +286,6 @@
     <!-- cards injected by JS -->
   </div>
 
-</div>
-
-<div class="pay-modal-overlay" id="payModalOverlay">
-  <div class="pay-modal">
-    <button class="pay-modal-close" id="payModalClose" aria-label="Close">✕</button>
-    <h3 id="payModalName">Package</h3>
-    <div class="pay-amount" id="payModalAmount">₹0</div>
-
-    <div class="qr-wrap" id="payModalQrWrap">
-      <canvas id="payModalCanvas"></canvas>
-    </div>
-
-    <div class="upi-row">
-      <span class="upi-id" id="payModalUpiId">nd69194@okaxis</span>
-      <button class="copy-btn" id="payModalCopy" type="button">Copy</button>
-    </div>
-
-    <a class="pay-btn" id="payModalPayBtn" href="#">Pay via UPI App</a>
-    <a class="alt-link" id="payModalCashfree" href="#" target="_blank" rel="noopener">Prefer card / netbanking? Pay via Cashfree</a>
-
-    <div class="order-id" id="payModalOrderId"></div>
-    <div class="note">Amount is fixed — please don't edit it in your UPI app. This QR isn't auto-verified, so keep your payment screenshot handy for confirmation.</div>
-  </div>
 </div>
 
 <script>
@@ -548,103 +395,9 @@ function goldDefs(uid){
     `;
     card.addEventListener('click', () => {
       if (window.WPAnalytics) window.WPAnalytics.logEvent('package_click', { name: pkg.name, price: pkg.price });
-      openPayModal(pkg);
+      window.location.href = pkg.link;
     });
     list.appendChild(card);
-  });
-
-  // ---- UPI payment modal ----
-  const UPI_ID = '9672823758@fam';
-  const UPI_PAYEE_NAME = 'WePlay';
-
-  function generateOrderId(){
-    return 'WP' + Date.now().toString(36).toUpperCase();
-  }
-
-  function buildUpiLink(pkg, orderId){
-    const note = `WePlay ${pkg.name} ${orderId}`;
-    return 'upi://pay'
-      + `?pa=${encodeURIComponent(UPI_ID)}`
-      + `&pn=${encodeURIComponent(UPI_PAYEE_NAME)}`
-      + `&am=${encodeURIComponent(pkg.price)}`
-      + `&cu=INR`
-      + `&tn=${encodeURIComponent(note)}`;
-  }
-
-  const payOverlay   = document.getElementById('payModalOverlay');
-  const payName      = document.getElementById('payModalName');
-  const payAmount    = document.getElementById('payModalAmount');
-  const payCanvas    = document.getElementById('payModalCanvas');
-  const payQrWrap    = document.getElementById('payModalQrWrap');
-  const payUpiIdEl   = document.getElementById('payModalUpiId');
-  const payCopyBtn   = document.getElementById('payModalCopy');
-  const payBtn       = document.getElementById('payModalPayBtn');
-  const payCashfree  = document.getElementById('payModalCashfree');
-  const payOrderIdEl = document.getElementById('payModalOrderId');
-  const payCloseBtn  = document.getElementById('payModalClose');
-
-  payUpiIdEl.textContent = UPI_ID;
-
-  function openPayModal(pkg){
-    const orderId = generateOrderId();
-    const upiLink = buildUpiLink(pkg, orderId);
-
-    payName.textContent   = pkg.name;
-    payAmount.textContent = `₹${pkg.price.toLocaleString('en-IN')}`;
-    payBtn.href           = upiLink;
-    payCashfree.href      = pkg.link;
-    payOrderIdEl.textContent = `Order ref: ${orderId}`;
-
-    // redraw the QR each time (canvas needs a fresh render)
-    payCanvas.style.display = 'block';
-    const fallback = payQrWrap.querySelector('.qr-fallback');
-    if (fallback) fallback.remove();
-
-    if (window.QRCode && window.QRCode.toCanvas) {
-      QRCode.toCanvas(payCanvas, upiLink, {
-        width: 200,
-        margin: 1,
-        color: { dark: '#1B2430', light: '#FFFFFF' }
-      }, (err) => {
-        if (err) showQrFallback();
-      });
-    } else {
-      showQrFallback();
-    }
-
-    payOverlay.classList.add('open');
-  }
-
-  function showQrFallback(){
-    payCanvas.style.display = 'none';
-    const msg = document.createElement('div');
-    msg.className = 'qr-fallback';
-    msg.textContent = 'QR preview unavailable — use the "Pay via UPI App" button below instead.';
-    payQrWrap.appendChild(msg);
-  }
-
-  function closePayModal(){
-    payOverlay.classList.remove('open');
-  }
-
-  payCloseBtn.addEventListener('click', closePayModal);
-  payOverlay.addEventListener('click', (e) => {
-    if (e.target === payOverlay) closePayModal();
-  });
-
-  payCopyBtn.addEventListener('click', () => {
-    const done = () => {
-      const original = payCopyBtn.textContent;
-      payCopyBtn.textContent = 'Copied!';
-      setTimeout(() => { payCopyBtn.textContent = original; }, 1500);
-    };
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(UPI_ID).then(done).catch(() => {
-        window.prompt('Copy this UPI ID:', UPI_ID);
-      });
-    } else {
-      window.prompt('Copy this UPI ID:', UPI_ID);
-    }
   });
 
   // ---- show the WePlay ID carried over from index.html ----
